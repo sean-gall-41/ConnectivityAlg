@@ -1,0 +1,4 @@
+{
+"GO": {"numCellsX": "128", "numCellsY": "32", "numTotCells": "4096"},
+"GR": {"numCellsX": "2048", "numCellsY": "512", "numTotCells": "1048576"}
+}

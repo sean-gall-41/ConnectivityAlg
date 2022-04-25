@@ -1,0 +1,12 @@
+numGOX 128
+numGOY 32
+numGOGOCon 12
+spanGOX 4
+spanGOY 4
+amplGOCon 35
+pRecipGO 100
+stdDevGOCon 1000
+normNumGOGOIn 12
+normNumGOGOOut 12
+maxNumGOGOIn 12
+maxNumGOGOOut 12
