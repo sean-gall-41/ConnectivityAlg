@@ -492,28 +492,6 @@ void Connection::calcFracRecip()
 	fracRecip = numRecip / (float)totCon;	
 }
 
-////TODO: test this
-//template<typename type>
-//void shuffle(type *inArr, int arrSize, rngx32::ctr_type &c, rngx32::key_type &k)
-//{
-//	std::set<int> found;	
-//	std::vector<type> shuffledArr(arrSize); // initialize shuffled array
-//
-//	int inArrIndex = 0;	
-//	int shuffledIndex;
-//	while (found.size() < arrSize)
-//	{
-//		shuffledIndex = randInt(c, k, 0, arrSize);
-//		if (found.find(shuffledIndex) == found.end())
-//		{
-//			shuffledArr[shuffledIndex] = inArr[inArrIndex];	
-//			found.insert(shuffledIndex);
-//			inArrIndex++;
-//		}
-//	}
-//	std::copy(shuffledArr.begin(), shuffledArr.end(), inArr.begin());
-//}
-
 bool operator==(const Connection &thisCon, const Connection &otherCon)
 {
 	return compareArrays(thisCon, otherCon)

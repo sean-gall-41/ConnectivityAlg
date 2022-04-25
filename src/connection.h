@@ -10,9 +10,6 @@
 
 typedef r123::Threefry2x32 rngx32;
 
-//template<typename type>
-//void shuffle(type *inArr, int arrSize, rngx32::ctr_type &c, rngx32::key_type &k);
-
 // TODO: utilize the algorithms suggested by rng123
 unsigned int randInt(rngx32::ctr_type &c, rngx32::key_type &k,
 	int a, int b);
