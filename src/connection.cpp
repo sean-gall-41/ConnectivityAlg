@@ -126,8 +126,6 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 			srcPosX = i % srcCell.getNumCellsX();
 			srcPosY = i / srcCell.getNumCellsX();
 	
-			// Note: if you're going to use this, note that it won't
-			// use the correct random functions
 			std::shuffle(spanIndArr, spanIndArr + numPCon, gen);
 
 			for (int j = 0; j < numPCon; j++)

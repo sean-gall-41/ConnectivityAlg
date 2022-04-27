@@ -7,7 +7,6 @@
 #include <limits.h>
 
 #include "params.h"
-#include "connectivitystate.h"
 
 class State
 {
