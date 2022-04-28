@@ -13,8 +13,8 @@
 const std::string ROOT 				   = "../../";
 const std::string DATA_DIR 			   = ROOT + "data/";
 const std::string INPUT_DIR 		   = DATA_DIR + "inputs/";
-const std::string CELL_PARAM_FILE	   = INPUT_DIR + "cellParams.json";
-const std::string CON_PARAM_FILE 	   = INPUT_DIR + "conParams.json";
+const std::string CELL_PARAM_FILE	   = INPUT_DIR + "cell_params.json";
+const std::string CON_PARAM_FILE 	   = INPUT_DIR + "con_params.json";
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord);
 

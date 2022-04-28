@@ -141,8 +141,8 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 				destIndex = destPosY * srcCell.getNumCellsX() + destPosX;
 
 				// regular connections
-				if (/*randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
-					&& */(srcConBoolArr(i, destIndex) == 0)
+				if (randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
+					&& (srcConBoolArr(i, destIndex) == 0)
 					&& srcNumConArr[i] < numConToMake
 					&& destNumConArr[destIndex] < numConToMake)
 				{
@@ -154,7 +154,7 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 
 					srcConBoolArr(i, destIndex) = 1;
 					
-					if (recipCons && randReal(c, k) >= 1 - pRecipLowerBase 
+					if (recipCons && randReal(c, k) >= 1 - pRecip 
 						&& (srcConBoolArr(destIndex, i) == 0)
 						&& srcNumConArr[destIndex] < numConToMake && destNumConArr[i] < numConToMake)
 					{

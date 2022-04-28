@@ -1,0 +1,15 @@
+{
+"GOGO": {"spanSrcOnDestX": "1", "spanSrcOnDestY": "1", "numPCon": "1", 
+		 "numConToMake": "1", "ampl": "0.35", "stdDev": "1.95",
+		 "pRecip": "1.0", "recipCons": "false", "pRecipLowerBase": "0.0",
+		 "reduceBaseRecip": "false", "maxNumAttempts": "200"},
+"PFGO": {"spanSrcOnDestX": "2048", "spanSrcOnDestY": "150", "numPCon": "309399", 
+		 "numConToMake": "3750", "ampl": "0.0", "stdDev": "0.0",
+		 "pRecip": "0.0", "recipCons": "false", "pRecipLowerBase": "0.0",
+		 "reduceBaseRecip": "false", "maxNumAttempts": "5"},
+"AAGO": {"spanSrcOnDestX": "150", "spanSrcOnDestY": "150", "numPCon": "22801", 
+		 "numConToMake": "1250", "ampl": "0.0", "stdDev": "0.0",
+		 "pRecip": "0.0", "recipCons": "false", "pRecipLowerBase": "0.0",
+		 "reduceBaseRecip": "false", "maxNumAttempts": "15"}
+}
+
