@@ -7,14 +7,16 @@
 #include "connection.h"
 #include "params.h"
 #include "conparams.h"
+#include "contypeparams.h"
 #include "celltype.h"
 
 // Keep in mind root is relative to the executable (yuck)
-const std::string ROOT 				   = "../../";
-const std::string DATA_DIR 			   = ROOT + "data/";
-const std::string INPUT_DIR 		   = DATA_DIR + "inputs/";
-const std::string CELL_PARAM_FILE	   = INPUT_DIR + "cell_params.json";
-const std::string CON_PARAM_FILE 	   = INPUT_DIR + "con_params.json";
+const std::string ROOT 				  = "../../";
+const std::string DATA_DIR 			  = ROOT + "data/";
+const std::string INPUT_DIR 		  = DATA_DIR + "inputs/";
+const std::string CELL_PARAM_FILE	  = INPUT_DIR + "cell_params.json";
+const std::string CON_PARAM_FILE 	  = INPUT_DIR + "con_params.json";
+const std::string CON_TYPE_PARAM_FILE = INPUT_DIR + "con_type_params.json";
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord);
 
@@ -34,9 +36,14 @@ int main()
 	ConParams gogoConParams(CON_PARAM_FILE, "GOGO");
 	std::cout << gogoConParams << std::endl;
 
+	// define connection type parameters 
+	ConTypeParams gogoConTypeParams(CON_TYPE_PARAM_FILE);
+	std::cout << gogoConTypeParams << std::endl;
+
 	// create connection
 	Connection gogoConnection(golgi, golgi, gogoConParams);
-	gogoConnection.establishConnectionDecay(12, 0, gaussian2d);
+	gogoConnection.establishConnectionDecay(std::stoi(gogoConTypeParams["maxConAttempts"]),
+		std::stoi(gogoConTypeParams["randSeed"]), gaussian2d);
 
 	std::cout << "Method 'establishConnectionDecay' results:" << std::endl; 
 	std::cout << "Number of Golgi-Golgi connections: " 
@@ -45,21 +52,6 @@ int main()
 		<< gogoConnection.getAvgNumCons() << std::endl;
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
-
-	//std::cout << std::endl;
-
-	//simpleConnection.resetCons();
-	//simpleConnection.establishConnectionCommon(bool(conTypeParams["recipCon"]),
-	//		bool(conTypeParams["needUnique"]), conTypeParams["normConAttempts"],
-	//		conTypeParams["maxConAttempts"], conTypeParams["randSeed"]);
-
-	//std::cout << "Method 'establishConnectionCommon' results:" << std::endl; 
-	//std::cout << "Number of Golgi-Golgi connections: " 
-	//	<< simpleConnection.getNumCons() << std::endl;
-	//std::cout << "Average Number of Golgi-Golgi connections: "
-	//	<< simpleConnection.getAvgNumCons() << std::endl;
-	//std::cout << "Percent reciprocal Golgi-Golgi connections: "
-	//	<< (simpleConnection.getRelRecipCons() * 100) << std::endl;
 
 	//ConParams pfgoConParams(CON_PARAM_FILE, "PFGO");
 	//ConParams aagoConParams(CON_PARAM_FILE, "AAGO");

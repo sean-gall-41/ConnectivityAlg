@@ -1,14 +1,5 @@
-../build/debug/main.o: main.cpp \
- ..//../random123/include/Random123/threefry.h \
- ..//../random123/include/Random123/features/compilerfeatures.h \
- ..//../random123/include/Random123/features/gccfeatures.h \
- ..//../random123/include/Random123/array.h \
- ..//../random123/include/Random123/features/sse.h \
- ..//../random123/include/Random123/uniform.hpp \
- ..//../random123/include/Random123/features/compilerfeatures.h \
- connection.h ..//../random123/include/Random123/MicroURNG.hpp \
- dynamic2darray.h dynamic2darray_impl.h conparams.h params.h \
- ..//../json/include/nlohmann/json.hpp \
+../build/debug/contypeparams.o: contypeparams.cpp contypeparams.h \
+ params.h ..//../json/include/nlohmann/json.hpp \
  ..//../json/include/nlohmann/adl_serializer.hpp \
  ..//../json/include/nlohmann/detail/conversions/from_json.hpp \
  ..//../json/include/nlohmann/detail/exceptions.hpp \
@@ -49,20 +40,8 @@
  ..//../json/include/nlohmann/detail/conversions/to_chars.hpp \
  ..//../json/include/nlohmann/ordered_map.hpp \
  ..//../json/include/nlohmann/detail/macro_unscope.hpp \
- ..//../json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
- celltype.h cellparams.h contypeparams.h
-..//../random123/include/Random123/threefry.h:
-..//../random123/include/Random123/features/compilerfeatures.h:
-..//../random123/include/Random123/features/gccfeatures.h:
-..//../random123/include/Random123/array.h:
-..//../random123/include/Random123/features/sse.h:
-..//../random123/include/Random123/uniform.hpp:
-..//../random123/include/Random123/features/compilerfeatures.h:
-connection.h:
-..//../random123/include/Random123/MicroURNG.hpp:
-dynamic2darray.h:
-dynamic2darray_impl.h:
-conparams.h:
+ ..//../json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp
+contypeparams.h:
 params.h:
 ..//../json/include/nlohmann/json.hpp:
 ..//../json/include/nlohmann/adl_serializer.hpp:
@@ -106,6 +85,3 @@ params.h:
 ..//../json/include/nlohmann/ordered_map.hpp:
 ..//../json/include/nlohmann/detail/macro_unscope.hpp:
 ..//../json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp:
-celltype.h:
-cellparams.h:
-contypeparams.h:

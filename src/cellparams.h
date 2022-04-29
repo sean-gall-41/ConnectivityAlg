@@ -3,10 +3,10 @@
 
 #include "params.h"
 
-class CellParams : Params
+class CellParams : public Params
 {
 public:
-	CellParams(){}
+	CellParams() {}
 	CellParams(const std::string inFile, std::string cellID) : Params(inFile)
 	{
 		cellParamMap = objectParams[cellID].get<std::map<std::string, std::string>>();	

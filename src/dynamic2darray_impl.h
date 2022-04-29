@@ -63,12 +63,16 @@ void Dynamic2DArray<type>::clear()
 template <typename type>
 void Dynamic2DArray<type>::reshape(int newNumRows, int newNumCols)
 {
-
 	array.resize(newNumRows * newNumCols);
 	
 	numRows = newNumRows;
 	numCols = newNumCols;
+}
 
+template <typename type>
+type* Dynamic2DArray<type>::data()
+{
+	return array.data();
 }
 
 template <typename type>

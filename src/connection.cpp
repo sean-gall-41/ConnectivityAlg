@@ -119,7 +119,7 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 	rngx32::key_type k = {{seed32}};	
 	r123::MicroURNG<rngx32> gen(c.incr(), k);
 
-	for (int attempt = 0; attempt < maxNumAttempts; attempt++)
+	for (int attempt = 1; attempt <= numConToMake; attempt++)
 	{
 		for (int i = 0; i < srcCell.getNumTotCells(); i++)
 		{
@@ -141,10 +141,10 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 				destIndex = destPosY * srcCell.getNumCellsX() + destPosX;
 
 				// regular connections
-				if (randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
-					&& (srcConBoolArr(i, destIndex) == 0)
-					&& srcNumConArr[i] < numConToMake
-					&& destNumConArr[destIndex] < numConToMake)
+				if (/*randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
+					&& */(srcConBoolArr(i, destIndex) == 0)
+					&& srcNumConArr[i] < attempt
+					&& destNumConArr[destIndex] < attempt)
 				{
 					srcConArr(i, srcNumConArr[i]) = destIndex;
 					srcNumConArr[i]++;	
@@ -156,7 +156,8 @@ void Connection::establishConnectionDecay(int maxNumAttempts,
 					
 					if (recipCons && randReal(c, k) >= 1 - pRecip 
 						&& (srcConBoolArr(destIndex, i) == 0)
-						&& srcNumConArr[destIndex] < numConToMake && destNumConArr[i] < numConToMake)
+						&& srcNumConArr[destIndex] < attempt
+						&& destNumConArr[i] < attempt)
 					{
 						srcConArr(destIndex, srcNumConArr[destIndex]) = i;
 						srcNumConArr[destIndex]++;	
@@ -208,29 +209,26 @@ void Connection::establishConnectionCommon(bool needUnique,
 
 	int numSrcConnected;
 
-	// fully redundant at this point (04/22/22)
-	tempDestNumConLim = numConToMake;			
 
-	for (int attempts = 0; attempts < maxNumAttempts; attempts++)
+	for (int i = 0; i < numConToMake; i++)
 	{
-		if (attempts == normNumAttempts) tempDestNumConLim = numConToMake; 
-
 		numSrcConnected = 0;
 		memset(srcConnected, false, srcCell.getNumTotCells() * sizeof(bool));
-	
+		// our randInt function returns value in half-open set [a, b)
 		while (numSrcConnected < srcCell.getNumTotCells())
 		{
-			// our randInt function returns value in half-open set [a, b)]
 			srcInd = randInt(c, k, 0, srcCell.getNumTotCells()); 
-
 			if (!srcConnected[srcInd])
 			{
 				srcPosX = srcInd % srcCell.getNumCellsX();
 				srcPosY = srcInd / srcCell.getNumCellsX();	
-
-				for (int i = 0; i < numConToMake; i++)
+				// fully redundant at this point (04/22/22)
+				tempDestNumConLim = numConToMake;			
+				int attempts;
+				for (attempts = 0; attempts < maxNumAttempts; attempts++)
 				{
-					
+					if (attempts == normNumAttempts) tempDestNumConLim = numConToMake; 
+
 					tempDestPosX = srcPosX;
 					tempDestPosY = srcPosY;
 
@@ -244,10 +242,10 @@ void Connection::establishConnectionCommon(bool needUnique,
 					
 					derivedDestInd = tempDestPosY * srcCell.getNumCellsX() + tempDestPosX;	
 
+					bool unique = true;
+
 					if (needUnique)
 					{
-						bool unique = true;
-
 						for (int j = 0; j < i; j++)
 						{
 							if (derivedDestInd == srcConArr(srcInd, j))
@@ -256,21 +254,23 @@ void Connection::establishConnectionCommon(bool needUnique,
 								break;
 							}
 						}
-
-						if (!unique) continue;
 					}
-
-					if (destNumConArr[derivedDestInd] < tempDestNumConLim
-							&& srcNumConArr[srcInd] < tempDestNumConLim)
+					
+					if (unique)
 					{
-						destConArr(derivedDestInd, destNumConArr[derivedDestInd]) = srcInd;
-						destNumConArr[derivedDestInd]++;
+						if (destNumConArr[derivedDestInd] < tempDestNumConLim
+								/*&& srcNumConArr[srcInd] < tempDestNumConLim */)
+						{
+							destConArr(derivedDestInd, destNumConArr[derivedDestInd]) = srcInd;
+							destNumConArr[derivedDestInd]++;
 
-						srcConArr(srcInd, srcNumConArr[srcInd]) = derivedDestInd;
-						srcNumConArr[srcInd]++;
-						break;
+							srcConArr(srcInd, srcNumConArr[srcInd]) = derivedDestInd;
+							srcNumConArr[srcInd]++;
+							break;
+						}
 					}
 				}
+
 				srcConnected[srcInd] = true;
 				numSrcConnected++;	
 			}
@@ -490,6 +490,39 @@ void Connection::calcFracRecip()
 	fracRecip = numRecip / (float)totCon;	
 }
 
+std::string Connection::toString()
+{
+	std::string outString = "";
+	outString += "[ totCon: " + std::to_string(totCon) + " ]\n";
+	outString += "[ avgNumCon: " + std::to_string(avgNumCon) + " ]\n";
+	if (recipCons)
+	{
+		outString += "[ fracRecip: " + std::to_string(fracRecip) + " ]\n";
+	}
+	return outString;
+}
+
+void Connection::toFile(const std::string outFileName)
+{
+	std::ofstream outFile(outFileName, std::ios::out | std::ios::binary);
+	if (!outFile.is_open())
+	{
+		std::cerr << "[ERROR]: cannot find file " << outFileName
+			<< ". Aborting all write operations." << std::endl;
+		exit(1);
+	}
+	outFile.write(reinterpret_cast<const char*>(destNumConArr),
+		destCell.getNumTotCells() * sizeof(destNumConArr[0]));
+	outFile.write(reinterpret_cast<const char*>(destConArr.data()),
+		destConArr.size() * sizeof(destConArr(0, 0)));
+	outFile.write(reinterpret_cast<const char*>(srcNumConArr),
+		srcCell.getNumTotCells() * sizeof(srcNumConArr[0]));
+	outFile.write(reinterpret_cast<const char*>(srcConArr.data()),
+		srcConArr.size() * sizeof(srcConArr(0, 0)));
+
+	outFile.close();
+}
+
 bool operator==(const Connection &thisCon, const Connection &otherCon)
 {
 	return compareArrays(thisCon, otherCon)
@@ -531,11 +564,11 @@ float randReal(rngx32::ctr_type &c, rngx32::key_type &k,
 	return (b - a) * returnVal + a;	
 }
 
-bool nearly_equal(float a, float b, int factor /* factor of epsilon */)
+bool nearly_equal(float a, float b, int factor /* factor of nextafter */)
 {
 	float min_a = a - (a - std::nextafter(a, std::numeric_limits<float>::lowest())) * factor;
-	float max_a = a - (std::nextafter(a, std::numeric_limits<float>::max()) - a) * factor;
+	float max_a = a + (std::nextafter(a, std::numeric_limits<float>::max()) - a) * factor;
 
-	return min_a <= b && max_a >= b;
+	return (min_a <= b) && (max_a >= b);
 }
 

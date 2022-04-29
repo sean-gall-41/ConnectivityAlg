@@ -19,6 +19,7 @@ public:
 	bool empty() const;
 	void clear();	
 	void reshape(int newNumRows, int newNumCols);
+	type* data();
 
 	// much easier thatn overloading '[]'
 	type &operator()(int row, int col);	

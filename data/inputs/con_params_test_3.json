@@ -1,6 +1,6 @@
 {
 "GOGO": {"spanSrcOnDestX": "10", "spanSrcOnDestY": "10", "numPCon": "100", 
-		 "numConToMake": "40", "ampl": "0.02", "stdDev": "1.95",
+		 "numConToMake": "40", "ampl": "0.35", "stdDev": "1.95",
 		 "pRecip": "1.0", "recipCons": "true", "pRecipLowerBase": "0.0",
 		 "reduceBaseRecip": "false", "maxNumAttempts": "200"},
 "PFGO": {"spanSrcOnDestX": "2048", "spanSrcOnDestY": "150", "numPCon": "309399", 

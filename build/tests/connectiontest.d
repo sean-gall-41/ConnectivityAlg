@@ -42,7 +42,8 @@
  ../../json/include/nlohmann/detail/macro_unscope.hpp \
  ../../json/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
  ../src/celltype.h ../src/cellparams.h ../src/conparams.h \
- ../src/connection.h ../../random123/include/Random123/threefry.h \
+ ../src/contypeparams.h ../src/connection.h \
+ ../../random123/include/Random123/threefry.h \
  ../../random123/include/Random123/features/compilerfeatures.h \
  ../../random123/include/Random123/features/gccfeatures.h \
  ../../random123/include/Random123/array.h \
@@ -98,6 +99,7 @@
 ../src/celltype.h:
 ../src/cellparams.h:
 ../src/conparams.h:
+../src/contypeparams.h:
 ../src/connection.h:
 ../../random123/include/Random123/threefry.h:
 ../../random123/include/Random123/features/compilerfeatures.h:
