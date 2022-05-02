@@ -19,6 +19,7 @@ const std::string CON_PARAM_FILE 	  = INPUT_DIR + "con_params.json";
 const std::string CON_TYPE_PARAM_FILE = INPUT_DIR + "con_type_params.json";
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord);
+float uniform(float dummy_1, float dummy_2, int dummy_3, int dummy_4);
 
 int main()
 {
@@ -30,22 +31,28 @@ int main()
 	// define Cells	
 	CellParams golgiParams(CELL_PARAM_FILE, "GO");
 	CellType golgi(golgiParams);
-	std::cout << golgi << std::endl;
+
+	CellParams granuleParams(CELL_PARAM_FILE, "GR");
+	CellType granule(granuleParams);
 
 	// define connection parameters
 	ConParams gogoConParams(CON_PARAM_FILE, "GOGO");
-	std::cout << gogoConParams << std::endl;
+	ConParams pfgoConParams(CON_PARAM_FILE, "PFGO");
+	ConParams aagoConParams(CON_PARAM_FILE, "AAGO");
 
 	// define connection type parameters 
-	ConTypeParams gogoConTypeParams(CON_TYPE_PARAM_FILE);
-	std::cout << gogoConTypeParams << std::endl;
+	ConTypeParams conTypeParams(CON_TYPE_PARAM_FILE);
 
-	// create connection
+	// establish golgi-golgi connections
 	Connection gogoConnection(golgi, golgi, gogoConParams);
-	gogoConnection.establishConnectionDecay(std::stoi(gogoConTypeParams["maxConAttempts"]),
-		std::stoi(gogoConTypeParams["randSeed"]), gaussian2d);
+	gogoConnection.establishConnectionJoe(
+		std::stoi(gogoConParams["maxNumAttempts"]),
+		std::stoi(conTypeParams["randSeed"]),
+		uniform);
 
-	std::cout << "Method 'establishConnectionDecay' results:" << std::endl; 
+	std::cout << "=== Golgi - Golgi Connections ===" << std::endl;
+
+	std::cout << "Method 'establishConnectionJoe' results:" << std::endl; 
 	std::cout << "Number of Golgi-Golgi connections: " 
 		<< gogoConnection.getNumCons() << std::endl;
 	std::cout << "Average Number of Golgi-Golgi connections: "
@@ -53,16 +60,54 @@ int main()
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
 
-	//ConParams pfgoConParams(CON_PARAM_FILE, "PFGO");
-	//ConParams aagoConParams(CON_PARAM_FILE, "AAGO");
+	// establish parallel-fiber-golgi connections
+	Connection pfgoConnection(granule, golgi, pfgoConParams);	
+	pfgoConnection.establishConnectionJoe(
+		std::stoi(pfgoConParams["maxNumAttempts"]),
+		std::stoi(conTypeParams["randSeed"]),
+		uniform);
+
+	std::cout << std::endl;
+	
+	std::cout << "=== Parallel Fiber - Golgi Connections ===" << std::endl;
+
+	std::cout << "Method 'establishConnectionJoe' results:" << std::endl; 
+	std::cout << "Number of Parallel Fiber - Golgi connections: " 
+		<< pfgoConnection.getNumCons() << std::endl;
+	std::cout << "Average Number of parallel fiber - Golgi connections: "
+		<< pfgoConnection.getAvgNumCons() << std::endl;
+
+	// TODO: add extra input variable for multiple values relating
+	// to num connections to make
+	Connection aagoConnection(granule, golgi, aagoConParams);
+	aagoConnection.establishConnectionJoe(
+		std::stoi(aagoConParams["maxNumAttempts"]),
+		std::stoi(conTypeParams["randSeed"]),
+		uniform);
+
+	std::cout << std::endl;
+	
+	std::cout << "=== ascending axon - Golgi Connections ===" << std::endl;
+
+	std::cout << "Method 'establishConnectionJoe' results:" << std::endl; 
+	std::cout << "Number of ascending axon - Golgi connections: " 
+		<< pfgoConnection.getNumCons() << std::endl;
+	std::cout << "Average Number of ascending axon - Golgi connections: "
+		<< pfgoConnection.getAvgNumCons() << std::endl;
 
 	return 0;
 }
+
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord)
 { 
 	float xCoordFloat = (xCoord * xCoord) / (2 * stdDev * stdDev);
 	float yCoordFloat = (yCoord * yCoord) / (2 * stdDev * stdDev);
 	return ampl * exp(-(xCoordFloat + yCoordFloat));
+}
+
+float uniform(float dummy_1, float dummy_2, int dummy_3, int dummy_4)
+{
+	return 1.0;
 }
 

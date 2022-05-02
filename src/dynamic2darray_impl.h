@@ -49,6 +49,18 @@ int Dynamic2DArray<type>::size() const
 }
 
 template <typename type>
+int Dynamic2DArray<type>::maxSize() const
+{
+	return array.max_size();
+}
+
+template <typename type>
+int Dynamic2DArray<type>::capacity() const
+{
+	return array.capacity();
+}
+
+template <typename type>
 bool Dynamic2DArray<type>::empty() const
 {
 	return array.empty();

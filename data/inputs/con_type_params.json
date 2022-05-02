@@ -1,6 +1,6 @@
 {
 "normConAttempts": "1",
-"maxConAttempts": "1",
+"maxConAttempts": "60",
 "randSeed": "0",
 "needUnique": "true"
 }

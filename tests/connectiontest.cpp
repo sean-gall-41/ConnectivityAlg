@@ -13,9 +13,10 @@ const std::string OUTPUT_DIR		   = DATA_DIR + "outputs/";
 const std::string CELL_PARAM_FILE	   = INPUT_DIR + "cell_params.json";
 const std::string CON_PARAM_FILE 	   = INPUT_DIR + "con_params_test_1.json";
 const std::string CON_TYPE_PARAM_FILE  = INPUT_DIR + "con_type_params.json";
-const std::string CON_DECAY_OUT_FILE   = OUTPUT_DIR + "con_decay.bin";
-const std::string CON_COMMON_OUT_FILE  = OUTPUT_DIR + "con_common.bin";
-
+const std::string CON_GOGO_DECAY_OUT_FILE   = OUTPUT_DIR + "con_gogo_decay.bin";
+const std::string CON_GOGO_COMMON_OUT_FILE  = OUTPUT_DIR + "con_gogo_common.bin";
+const std::string CON_PF_GO_DECAY_OUT_FILE   = OUTPUT_DIR + "con_pfgo_decay.bin";
+const std::string CON_PF_GO_COMMON_OUT_FILE  = OUTPUT_DIR + "con_pfgo_common.bin";
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord);
 float uniform(float dummy_1, float dummy_2, int dummy_3, int dummy_4);
@@ -23,27 +24,31 @@ float uniform(float dummy_1, float dummy_2, int dummy_3, int dummy_4);
 
 int main()
 {
+	// define Cells	
 	CellParams golgiParams(CELL_PARAM_FILE, "GO");
-
 	CellType golgi(golgiParams);
-	std::cout << "=== Golgi Cell ===" << std::endl;
-	std::cout << golgi << std::endl;	
 
+	//CellParams granuleParams(CELL_PARAM_FILE, "GR");
+	//CellType granule(granuleParams);
+
+	// define connection parameters
 	ConParams gogoConParams(CON_PARAM_FILE, "GOGO");
-	std::cout << "=== gogo connection params ===" << std::endl;
-	std::cout << gogoConParams << std::endl;
+	//ConParams pfgoConParams(CON_PARAM_FILE, "PFGO");
+	//ConParams aagoConParams(CON_PARAM_FILE, "AAGO");
 
-	ConTypeParams gogoConTypeParams(CON_TYPE_PARAM_FILE);
-	std::cout << "=== gogo connection *type* params ===" << std::endl;
-	std::cout << gogoConTypeParams << std::endl;
+	// define connection type parameters 
+	ConTypeParams conTypeParams(CON_TYPE_PARAM_FILE);
 
+	// establish golgi-golgi connections
 	Connection gogoConnection(golgi, golgi, gogoConParams);
-	gogoConnection.establishConnectionDecay(
-		std::stoi(gogoConTypeParams["maxConAttempts"]),
-		std::stoi(gogoConTypeParams["randSeed"]),
+	gogoConnection.establishConnectionJoe(
+		std::stoi(gogoConParams["maxNumAttempts"]),
+		std::stoi(conTypeParams["randSeed"]),
 		uniform);
 
-	std::cout << "Method 'establishConnectionDecay' results:" << std::endl; 
+	std::cout << "=== Golgi - Golgi Connections ===" << std::endl;
+
+	std::cout << "Method 'establishConnectionJoe' results:" << std::endl; 
 	std::cout << "Number of Golgi-Golgi connections: " 
 		<< gogoConnection.getNumCons() << std::endl;
 	std::cout << "Average Number of Golgi-Golgi connections: "
@@ -51,14 +56,14 @@ int main()
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
 
-	gogoConnection.toFile(CON_DECAY_OUT_FILE);
+	gogoConnection.toFile(CON_GOGO_DECAY_OUT_FILE);
 
 	gogoConnection.resetCons();	
+	// NOTE: debatable whether we want to use contype params or place in connection params
 	gogoConnection.establishConnectionCommon(
-		(strcasecmp("true", gogoConTypeParams["needUnique"].c_str()) == 0),
-		std::stoi(gogoConTypeParams["normConAttempts"]),
-		std::stoi(gogoConTypeParams["maxConAttempts"]),
-		std::stoi(gogoConTypeParams["randSeed"]));
+		std::stoi(conTypeParams["normConAttempts"]),
+		std::stoi(conTypeParams["maxConAttempts"]),
+		std::stoi(conTypeParams["randSeed"]));
 	
 	std::cout << std::endl;
 
@@ -70,7 +75,26 @@ int main()
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
 
-	gogoConnection.toFile(CON_COMMON_OUT_FILE);
+	gogoConnection.toFile(CON_GOGO_COMMON_OUT_FILE);
+
+	// establish parallel-fiber-golgi connections
+	//Connection pfgoConnection(granule, golgi, pfgoConParams);	
+	//pfgoConnection.establishConnectionJoe(
+	//	std::stoi(pfgoConParams["maxNumAttempts"]),
+	//	std::stoi(conTypeParams["randSeed"]),
+	//	uniform);
+
+	//std::cout << std::endl;
+	//
+	//std::cout << "=== Parallel Fiber - Golgi Connections ===" << std::endl;
+
+	//std::cout << "Method 'establishConnectionJoe' results:" << std::endl; 
+	//std::cout << "Number of Parallel Fiber - Golgi connections: " 
+	//	<< pfgoConnection.getNumCons() << std::endl;
+	//std::cout << "Average Number of parallel fiber - Golgi connections: "
+	//	<< pfgoConnection.getAvgNumCons() << std::endl;
+
+	//pfgoConnection.toFile(CON_PF_GO_DECAY_OUT_FILE);
 
 	return 0;	
 }

@@ -32,11 +32,13 @@ public:
 	float getRelRecipCons();
 	void resetCons();
 
-	void establishConnectionDecay(int maxNumAttempts,
+	bool validateArrAllocate();
+
+	void establishConnectionJoe(int maxNumAttempts,
 		unsigned int seed32, float (*probFunc)(float, float, int, int));
 
-	void establishConnectionCommon(bool needUnique,
-		int normNumAttempts, int maxNumAttempts, unsigned int seed32);
+	void establishConnectionCommon(int normNumAttempts,
+		int maxNumAttempts, unsigned int seed32);
 
 	template<typename type>
 	friend void shuffle(type *inArr, int arrSize, rngx32::ctr_type &c, rngx32::key_type &k);
@@ -83,7 +85,6 @@ private:
 	// input arrays
 	int *destNumConArr;
 	Dynamic2DArray<int> destConArr;
-
 	//output arrays
 	int *srcNumConArr;
 	Dynamic2DArray<int> srcConArr;

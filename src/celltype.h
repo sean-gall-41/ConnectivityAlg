@@ -31,7 +31,7 @@ public:
 	friend bool operator!=(const CellType &thisCell, const CellType &otherCell);
 	friend std::ostream &operator<<(std::ostream &os, CellType &cell);
 
-protected:
+private:
 	int numCellsX;
 	int numCellsY;
 	int numTotCells;

@@ -16,6 +16,8 @@ public:
 
 	void fill(type value);
 	int size() const;
+	int maxSize() const;
+	int capacity() const;
 	bool empty() const;
 	void clear();	
 	void reshape(int newNumRows, int newNumCols);
