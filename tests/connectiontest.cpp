@@ -5,6 +5,7 @@
 #include "contypeparams.h"
 #include "connection.h"
 
+
 const std::string ROOT 				   = "../../";
 const std::string DATA_DIR 			   = ROOT + "data/";
 const std::string INPUT_DIR 		   = DATA_DIR + "inputs/";
@@ -12,10 +13,13 @@ const std::string OUTPUT_DIR		   = DATA_DIR + "outputs/";
 const std::string CELL_PARAM_FILE	   = INPUT_DIR + "cell_params.json";
 const std::string CON_PARAM_FILE 	   = INPUT_DIR + "con_params_test_1.json";
 const std::string CON_TYPE_PARAM_FILE  = INPUT_DIR + "con_type_params.json";
-const std::string OUTPUT_FILE		   = OUTPUT_DIR + "con_decay.bin";
+const std::string CON_DECAY_OUT_FILE   = OUTPUT_DIR + "con_decay.bin";
+const std::string CON_COMMON_OUT_FILE  = OUTPUT_DIR + "con_common.bin";
+
 
 float gaussian2d(float ampl, float stdDev, int xCoord, int yCoord);
 float uniform(float dummy_1, float dummy_2, int dummy_3, int dummy_4);
+
 
 int main()
 {
@@ -47,7 +51,7 @@ int main()
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
 
-	gogoConnection.toFile(OUTPUT_FILE);
+	gogoConnection.toFile(CON_DECAY_OUT_FILE);
 
 	gogoConnection.resetCons();	
 	gogoConnection.establishConnectionCommon(
@@ -65,6 +69,8 @@ int main()
 		<< gogoConnection.getAvgNumCons() << std::endl;
 	std::cout << "Percent reciprocal Golgi-Golgi connections: "
 		<< (gogoConnection.getRelRecipCons() * 100) << std::endl;
+
+	gogoConnection.toFile(CON_COMMON_OUT_FILE);
 
 	return 0;	
 }
