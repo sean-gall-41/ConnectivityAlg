@@ -42,7 +42,7 @@ public:
 	friend void shuffle(type *inArr, int arrSize, rngx32::ctr_type &c, rngx32::key_type &k);
 
 	std::string toString();
-	void toFile(const std::string outFile);	
+	void toFile(const std::string outFileName);	
 
 	friend bool operator==(const Connection &thisCon, const Connection &otherCon);
 	friend bool operator!=(const Connection &thisCon, const Connection &otherCon);

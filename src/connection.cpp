@@ -507,7 +507,7 @@ void Connection::toFile(const std::string outFileName)
 	std::ofstream outFile(outFileName, std::ios::out | std::ios::binary);
 	if (!outFile.is_open())
 	{
-		std::cerr << "[ERROR]: cannot find file " << outFileName
+		std::cerr << "[ERROR]: cannot find file " << outFileName 
 			<< ". Aborting all write operations." << std::endl;
 		exit(1);
 	}
