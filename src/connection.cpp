@@ -154,10 +154,10 @@ void Connection::establishConnectionJoe(int maxNumAttempts,
 	// the positions we will be using to populate our connectivity arrays	
 	int srcPosX, srcPosY;
 	int destPosX, destPosY;
-	int srcIndex;	
+	int destIndex;	
 
-	float gridScaleFactorX = (float)destCell.getNumCellsX() / (float)srcCell.getNumCellsX();
-	float gridScaleFactorY = (float)destCell.getNumCellsY() / (float)srcCell.getNumCellsY();
+	float gridScaleFactorX = (float)srcCell.getNumCellsX() / (float)destCell.getNumCellsX();
+	float gridScaleFactorY = (float)srcCell.getNumCellsY() / (float)destCell.getNumCellsY();
 
 	// initialize the random number generator counter and key
 	rngx32::ctr_type c = {{0, 0}};
@@ -171,34 +171,27 @@ void Connection::establishConnectionJoe(int maxNumAttempts,
 	// why should num tries be linked to num connections to make?
 	for (int attempt = 1; attempt <= maxNumAttempts; attempt++)
 	{
-		for (int i = 0; i < destCell.getNumTotCells(); i++)
+		std::cout << "Attempt Number: " << attempt << std::endl;
+		for (int i = 0; i < srcCell.getNumTotCells(); i++)
 		{
-			// NOTE: KEY POINT OF CONFUSION: the srcposx is really on dest grid!
-			// fixed here 05/02/2022
-			destPosX = i % destCell.getNumCellsX();
-			destPosY = i / destCell.getNumCellsX();
+			srcPosX = i % srcCell.getNumCellsX();
+			srcPosY = i / srcCell.getNumCellsX();
 	
 			std::shuffle(spanIndArr, spanIndArr + numPCon, gen);
 
+			if (i % 512 == 0) std::cout << "Outer connection check for cell: " << i << std::endl;
 			for (int j = 0; j < numConToMake; j++)
 			{
-				srcPosX = (int)std::round(destPosX / gridScaleFactorX) + xCoordArr[spanIndArr[j]];
-				srcPosY = (int)std::round(destPosY / gridScaleFactorY) + yCoordArr[spanIndArr[j]];
+				destPosX = (int)std::round(srcPosX / gridScaleFactorX) + xCoordArr[spanIndArr[j]];
+				destPosY = (int)std::round(srcPosY / gridScaleFactorY) + yCoordArr[spanIndArr[j]];
 
-				srcPosX = (srcPosX % srcCell.getNumCellsX() + srcCell.getNumCellsX())
-					% srcCell.getNumCellsX();
-				srcPosY = (srcPosY % srcCell.getNumCellsY() + srcCell.getNumCellsY())
-					% srcCell.getNumCellsY();
+				destPosX = (destPosX % destCell.getNumCellsX() + destCell.getNumCellsX())
+					% destCell.getNumCellsX();
+				destPosY = (destPosY % destCell.getNumCellsY() + destCell.getNumCellsY())
+					% destCell.getNumCellsY();
 
-				srcIndex = srcPosY * srcCell.getNumCellsX() + srcPosX;
+				destIndex = destPosY * destCell.getNumCellsX() + destPosX;
 				
-				// debug bounds check
-				if (srcIndex >= srcCell.getNumTotCells())
-				{
-					std::cout << "destIndex is out of bounds" << std::endl;
-					exit(-1);
-				}
-
 				// regular connections
 				// when using numConToMake as measure above,
 				// number of connections at these indices only need
@@ -206,35 +199,34 @@ void Connection::establishConnectionJoe(int maxNumAttempts,
 				// (which slyly encodes two conceptual points:
 				// 1. the number attempt we are on for making cons
 				// 2. an adaptive maximum num connections at each alg time step)
-				if (/*randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
-					&& */(srcConBoolArr(srcIndex, i) == 0)
-					&& srcNumConArr[srcIndex] < numConToMake
-					&& destNumConArr[i] < numConToMake)
+				// ALSO: careful with this comparison! What if randReal is very close to 0?	
+				if (randReal(c, k) >= 1 - pConArr[spanIndArr[j]]
+					&& (srcConBoolArr(i, destIndex) == 0)
+					&& srcNumConArr[i] < numConToMake
+					&& destNumConArr[destIndex] < numConToMake)
 				{
-					srcConArr(srcIndex, srcNumConArr[srcIndex]) = i;
-					srcNumConArr[srcIndex]++;	
+					srcConArr(i, srcNumConArr[i]) = destIndex;
+					srcNumConArr[i]++;	
 
-					destConArr(i, destNumConArr[i]) = srcIndex;
-					destNumConArr[i]++;	
+					destConArr(destIndex, destNumConArr[destIndex]) = i;
+					destNumConArr[destIndex]++;	
 
-					srcConBoolArr(srcIndex, i) = 1;
+					srcConBoolArr(i, destIndex) = 1;
 					
 					if (recipCons && randReal(c, k) >= 1 - pRecip 
-						&& (srcConBoolArr(i, srcIndex) == 0)
-						&& srcNumConArr[i] < numConToMake 
-						&& destNumConArr[srcIndex] < numConToMake)
+						&& (srcConBoolArr(destIndex, i) == 0)
+						&& srcNumConArr[destIndex] < numConToMake 
+						&& destNumConArr[i] < numConToMake)
 					{
-						srcConArr(i, srcNumConArr[i]) = srcIndex;
-						srcNumConArr[i]++;	
+						srcConArr(destIndex, srcNumConArr[destIndex]) = i;
+						srcNumConArr[destIndex]++;	
 
-						destConArr(srcIndex, destNumConArr[srcIndex]) = i;
-						destNumConArr[srcIndex]++;	
+						destConArr(i, destNumConArr[i]) = destIndex;
+						destNumConArr[i]++;	
 	
-						srcConBoolArr(i, srcIndex) = 1;		
+						srcConBoolArr(destIndex, i) = 1;		
 					}	
 				}
-				// using a decay introduces a bias, which is what the other
-				// code in innetconnectivity did
 			}
 		}
 	}
@@ -259,59 +251,59 @@ void Connection::establishConnectionJoe(int maxNumAttempts,
 void Connection::establishConnectionCommon(int normNumAttempts,
 	int maxNumAttempts, unsigned int seed32)
 {
-	bool *destConnected = new bool[destCell.getNumTotCells()];
+	bool *srcConnected = new bool[srcCell.getNumTotCells()];
 
 	rngx32::ctr_type c = {{0,0}};
 	rngx32::key_type k = {{seed32}};	
 
 	int srcIndex;
-	int destIndex;
 	int srcPosX;
 	int srcPosY;
+	int destIndex;
 	int destPosX;
 	int destPosY;
 	int tempNumConLim;
-	int numDestConnected;
+	int numSrcConnected;
 
-	float gridScaleFactorX = (float)destCell.getNumCellsX() / (float)srcCell.getNumCellsX();
-	float gridScaleFactorY = (float)destCell.getNumCellsY() / (float)srcCell.getNumCellsY();
+	float gridScaleFactorX = (float)srcCell.getNumCellsX() / (float)destCell.getNumCellsX();
+	float gridScaleFactorY = (float)srcCell.getNumCellsY() / (float)destCell.getNumCellsY();
 
 	for (int i = 0; i < numConToMake; i++)
 	{
-		numDestConnected = 0;
-		memset(destConnected, false, destCell.getNumTotCells() * sizeof(bool));
+		numSrcConnected = 0;
+		memset(srcConnected, false, srcCell.getNumTotCells() * sizeof(bool));
 		// our randInt function returns value in half-open set [a, b)
-		while (numDestConnected < destCell.getNumTotCells())
+		while (numSrcConnected < srcCell.getNumTotCells())
 		{
-			destIndex = randInt(c, k, 0, destCell.getNumTotCells()); 
-			if (!destConnected[destIndex])
+			srcIndex = randInt(c, k, 0, srcCell.getNumTotCells()); 
+			if (!srcConnected[srcIndex])
 			{
-				destPosX = destIndex % destCell.getNumCellsX();
-				destPosY = destIndex / destCell.getNumCellsX();	
+				srcPosX = srcIndex % srcCell.getNumCellsX();
+				srcPosY = srcIndex / srcCell.getNumCellsX();	
 				// fully redundant at this point (04/22/22)
 				tempNumConLim = numConToMake;			
 				for (int attempts = 1; attempts <= maxNumAttempts; attempts++)
 				{
 					if (attempts == normNumAttempts) tempNumConLim = numConToMake; 
 
-					srcPosX = (int)std::round(destPosX / gridScaleFactorX);
-					srcPosY = (int)std::round(destPosY / gridScaleFactorY);
+					destPosX = (int)std::round(srcPosX / gridScaleFactorX);
+					destPosY = (int)std::round(srcPosY / gridScaleFactorY);
 
-					srcPosX += (int)std::round((randReal(c, k) - 0.5) * (spanSrcOnDestX + 1));		
-					srcPosY += (int)std::round((randReal(c, k) - 0.5) * (spanSrcOnDestY + 1));
+					destPosX += (int)std::round((randReal(c, k) - 0.5) * (spanSrcOnDestX + 1));		
+					destPosY += (int)std::round((randReal(c, k) - 0.5) * (spanSrcOnDestY + 1));
 
-					srcPosX = (srcPosX % srcCell.getNumCellsX() + srcCell.getNumCellsX())
-						% srcCell.getNumCellsX();	
-					srcPosY = (srcPosY % srcCell.getNumCellsY() + srcCell.getNumCellsY())
-						% srcCell.getNumCellsY();	
+					destPosX = (destPosX % destCell.getNumCellsX() + destCell.getNumCellsX())
+						% destCell.getNumCellsX();	
+					destPosY = (destPosY % destCell.getNumCellsY() + destCell.getNumCellsY())
+						% destCell.getNumCellsY();	
 					
-					srcIndex = srcPosY * srcCell.getNumCellsX() + srcPosX;	
+					destIndex = destPosY * destCell.getNumCellsX() + destPosX;	
 
 					bool unique = true;
 
 					for (int j = 0; j < i; j++)
 					{
-						if (srcIndex == destConArr(destIndex, j))
+						if (destIndex == srcConArr(srcIndex, j))
 						{
 							unique = false;
 							break;
@@ -333,8 +325,8 @@ void Connection::establishConnectionCommon(int normNumAttempts,
 					}
 				}
 
-				destConnected[destIndex] = true;
-				numDestConnected++;	
+				srcConnected[srcIndex] = true;
+				numSrcConnected++;	
 			}
 		}	
 	}
@@ -345,7 +337,7 @@ void Connection::establishConnectionCommon(int normNumAttempts,
 	}
 	avgNumCon = totCon / (float)destCell.getNumTotCells();
 	
-	delete[] destConnected;
+	delete[] srcConnected;
 }
 
 void Connection::deepCopy(const Connection &otherCon)
