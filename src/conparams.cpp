@@ -24,4 +24,3 @@ std::ostream &operator<<(std::ostream &os, ConParams &conParams)
 	return os << conParams.toString();
 }
 
-
